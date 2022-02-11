@@ -26,7 +26,7 @@ rule filter_seq:
 rule mask_primers:
     input:
         "results/quality_pass/{sample}_R1_quality-pass.fastq",
-        "results/quality_pass/{sample}_R2_quality-pass.fastq"
+        "results/quality_pass/{sample}_R2_quality-pass.fastq",
         config['constant_primers'],
         config['vgene_primers']
     output:
