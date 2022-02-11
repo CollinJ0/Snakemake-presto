@@ -2,7 +2,7 @@ import os
 
 configfile: "config.yaml"
 
-SAMPLES = [f.split('_R1_001.fastq.gz')[0] for f in os.listdir('data') if '_R1_001.fastq.gz' in f]
+SAMPLES = [f.split('_R1_001.fastq')[0] for f in os.listdir('data') if '_R1_001.fastq' in f]
 
 rule all:
     input:
