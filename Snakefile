@@ -11,8 +11,8 @@ rule all:
 
 rule filter_seq:
     input:
-        "data/{sample}_R1_001.fastq.gz",
-        "data/{sample}_R2_001.fastq.gz"
+        "data/{sample}_R1_001.fastq",
+        "data/{sample}_R2_001.fastq"
     output:
         temp("results/quality_pass/{sample}_R1_quality-pass.fastq"),
         temp("results/quality_pass/{sample}_R2_quality-pass.fastq"),
