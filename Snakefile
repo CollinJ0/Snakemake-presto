@@ -44,8 +44,8 @@ rule pair_seq:
         "results/primers_pass/{sample}_R1_primers-pass.fastq",
         "results/primers_pass/{sample}_R2_primers-pass.fastq"
     output:
-        "results/pair_pass/{sample}_R1_primers-pass_pair-pass.fastq",
-        "results/pair_pass/{sample}_R2_primers-pass_pair-pass.fastq"
+        temp("results/pair_pass/{sample}_R1_primers-pass_pair-pass.fastq"),
+        temp("results/pair_pass/{sample}_R2_primers-pass_pair-pass.fastq")
     threads: 1
     shell:
         "PairSeq.py -1 {input[0]} -2 {input[1]} --1f BARCODE --coord illumina --outdir results/pair_pass/"
