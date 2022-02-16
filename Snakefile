@@ -64,6 +64,17 @@ rule build_consensus:
         shell("BuildConsensus.py -s {input[0]} --bf BARCODE --pf PRIMER --prcons 0.6 --maxerror 0.1 --maxgap 0.5 --outdir results/consensus_pass/ --outname {wildcards.sample}_R1 --log results/logs/{wildcards.sample}_BC1.log --nproc {threads}"),
         shell("BuildConsensus.py -s {input[1]} --bf BARCODE --pf PRIMER --prcons 0.6 --maxerror 0.1 --maxgap 0.5 --outdir results/consensus_pass/ --outname {wildcards.sample}_R2 --log results/logs/{wildcards.sample}_BC2.log --nproc {threads}")
 
+rule pair_seq2:
+    input:
+        "results/consensus_pass/{sample}_R1_consensus-pass.fastq",
+        "results/consensus_pass/{sample}_R2_consensus-pass.fastq"
+    output:
+        "results/pair_pass/{sample}_R1_consensus-pass_pair-pass.fastq",
+        "results/pair_pass/{sample}_R2_consensus-pass_pair-pass.fastq"
+    threads: 1
+    shell:
+        "PairSeq.py -1 {input[0]} -2 {input[1]} --coord presto --outdir results/pair_pass/"
+
 # rule assemble_pairs:
 #     input: 
 #         "results/pair_pass/{sample}_R1_primers-pass_pair-pass.fastq",
