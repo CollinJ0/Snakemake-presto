@@ -6,8 +6,8 @@ SAMPLES = [f.split('_R1_001.fastq')[0] for f in os.listdir('data') if '_R1_001.f
 
 rule all:
     input:
-        expand("results/pair_pass/{sample}_R1_primers-pass_pair-pass.fastq", sample=SAMPLES),
-        expand("results/pair_pass/{sample}_R2_primers-pass_pair-pass.fastq", sample=SAMPLES)
+        expand("results/consensus_pass/{sample}_R1_consensus-pass.fastq", sample=SAMPLES),
+        expand("results/consensus_pass/{sample}_R2_consensus-pass.fastq", sample=SAMPLES)
 
 rule filter_seq:
     input:
@@ -49,3 +49,27 @@ rule pair_seq:
     threads: 1
     shell:
         "PairSeq.py -1 {input[0]} -2 {input[1]} --1f BARCODE --coord illumina --outdir results/pair_pass/"
+
+rule build_consensus:
+    input:
+        "results/pair_pass/{sample}_R1_primers-pass_pair-pass.fastq",
+        "results/pair_pass/{sample}_R2_primers-pass_pair-pass.fastq"
+    output:
+        "results/consensus_pass/{sample}_R1_consensus-pass.fastq",
+        "results/consensus_pass/{sample}_R2_consensus-pass.fastq",
+        "results/logs/{sample}_BC1.log",
+        "results/logs/{sample}_BC2.log"
+    threads: 16
+    run:
+        shell("BuildConsensus.py -s {input[0]} --bf BARCODE --pf PRIMER --prcons 0.6 --maxerror 0.1 --maxgap 0.5 --outdir results/consensus_pass/ --outname {wildcards.sample}_R1 --log results/logs/{wildcards.sample}_BC1.log --nproc {threads}"),
+        shell("BuildConsensus.py -s {input[1]} --bf BARCODE --pf PRIMER --prcons 0.6 --maxerror 0.1 --maxgap 0.5 --outdir results/consensus_pass/ --outname {wildcards.sample}_R2 --log results/logs/{wildcards.sample}_BC2.log --nproc {threads}")
+
+# rule assemble_pairs:
+#     input: 
+#         "results/pair_pass/{sample}_R1_primers-pass_pair-pass.fastq",
+#         "results/pair_pass/{sample}_R2_primers-pass_pair-pass.fastq"
+#     output: 
+
+# AssemblePairs.py align -1 MS12_R2_consensus-pass_pair-pass.fastq \
+#     -2 MS12_R1_consensus-pass_pair-pass.fastq --coord presto --rc tail \
+#     --1f CONSCOUNT --2f CONSCOUNT PRCONS --outname MS12 --log AP.log
