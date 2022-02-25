@@ -6,7 +6,6 @@ SAMPLES = [f.split('_R1_001.fastq')[0] for f in os.listdir('data') if '_R1_001.f
 
 rule all:
     input:
-        expand("results/annotation_tables/{sample}_atleast-2_headers.tab", sample=SAMPLES),
         expand("results/annotation_tables/{sample}_FS1_table.tab", sample=SAMPLES),
         expand("results/annotation_tables/{sample}_FS2_table.tab", sample=SAMPLES),
         expand("results/annotation_tables/{sample}_MP1_table.tab", sample=SAMPLES),
@@ -163,7 +162,8 @@ rule parse_log:
         "results/annotation_tables/{sample}_MP2_table.tab",
         "results/annotation_tables/{sample}_BC1_table.tab",
         "results/annotation_tables/{sample}_BC2_table.tab",
-        "results/annotation_tables/{sample}_AP_table.tab"
+        "results/annotation_tables/{sample}_AP_table.tab",
+        "results/annotation_tables/{sample}_atleast-2_headers.tab"
     conda:
         "environment.yml"
     threads: 4
