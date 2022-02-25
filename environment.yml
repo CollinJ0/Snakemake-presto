@@ -1,0 +1,8 @@
+name: Snakemake-presto
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - snakemake
+  - presto

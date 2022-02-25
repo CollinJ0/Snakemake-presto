@@ -24,6 +24,8 @@ rule filter_seq:
         temp("results/quality_pass/{sample}_R2_quality-pass.fastq"),
         "results/logs/{sample}_FS1.log",
         "results/logs/{sample}_FS2.log"
+    conda:
+        "environment.yml"
     threads: 16
     run:
         shell("FilterSeq.py quality -s {input[0]} -q 20 --outdir results/quality_pass/ --outname {wildcards.sample}_R1 --log results/logs/{wildcards.sample}_FS1.log --nproc {threads}"),
@@ -40,6 +42,8 @@ rule mask_primers:
         temp("results/primers_pass/{sample}_R2_primers-pass.fastq"),
         "results/logs/{sample}_MP1.log",
         "results/logs/{sample}_MP2.log"
+    conda:
+        "environment.yml"
     threads: 16
     run:
         shell("MaskPrimers.py score -s {input[0]} -p {input[2]} --start 12 --mode cut --barcode --outdir results/primers_pass/ --outname {wildcards.sample}_R1 --log results/logs/{wildcards.sample}_MP1.log --nproc {threads}"),
@@ -52,6 +56,8 @@ rule pair_seq:
     output:
         temp("results/pair_pass/{sample}_R1_primers-pass_pair-pass.fastq"),
         temp("results/pair_pass/{sample}_R2_primers-pass_pair-pass.fastq")
+    conda:
+        "environment.yml"
     threads: 1
     shell:
         "PairSeq.py -1 {input[0]} -2 {input[1]} --1f BARCODE --coord illumina --outdir results/pair_pass/"
@@ -65,6 +71,8 @@ rule build_consensus:
         "results/consensus_pass/{sample}_R2_consensus-pass.fastq",
         "results/logs/{sample}_BC1.log",
         "results/logs/{sample}_BC2.log"
+    conda:
+        "environment.yml"
     threads: 16
     run:
         shell("BuildConsensus.py -s {input[0]} --bf BARCODE --pf PRIMER --prcons 0.6 --maxerror 0.1 --maxgap 0.5 --outdir results/consensus_pass/ --outname {wildcards.sample}_R1 --log results/logs/{wildcards.sample}_BC1.log --nproc {threads}"),
@@ -77,6 +85,8 @@ rule pair_seq2:
     output:
         temp("results/pair_pass/{sample}_R1_consensus-pass_pair-pass.fastq"),
         temp("results/pair_pass/{sample}_R2_consensus-pass_pair-pass.fastq")
+    conda:
+        "environment.yml"
     threads: 1
     shell:
         "PairSeq.py -1 {input[0]} -2 {input[1]} --coord illumina --outdir results/pair_pass/"
@@ -87,6 +97,8 @@ rule assemble_pairs:
         "results/pair_pass/{sample}_R2_consensus-pass_pair-pass.fastq"
     output:
         "results/assemble_pass/{sample}_assemble-pass.fastq"
+    conda:
+        "environment.yml"
     threads: 16
     shell:
         "AssemblePairs.py align -1 {input[0]} -2 {input[1]} --coord presto --rc tail --1f CONSCOUNT --2f CONSCOUNT PRCONS --outname {wildcards.sample} --outdir results/assemble_pass --log results/logs/{wildcards.sample}_AP.log --nproc {threads}"    
@@ -96,6 +108,8 @@ rule parse_headers1:
         "results/assemble_pass/{sample}_assemble-pass.fastq"
     output:
         "results/assemble_pass/{sample}_assemble-pass_reheader.fastq"
+    conda:
+        "environment.yml"
     threads: 1
     shell:
         "ParseHeaders.py collapse -s {input} -f CONSCOUNT --act min --outdir results/assemble_pass"
@@ -105,6 +119,8 @@ rule collapse_seq:
         "results/assemble_pass/{sample}_assemble-pass_reheader.fastq"
     output:
         "results/collapse_unique/{sample}_collapse-unique.fastq"
+    conda:
+        "environment.yml"
     threads: 1
     shell:
         "CollapseSeq.py -s {input} -n 20 --inner --uf PRCONS --cf CONSCOUNT --act sum --outname {wildcards.sample} --outdir results/collapse_unique"
@@ -114,6 +130,8 @@ rule split_seq:
         "results/collapse_unique/{sample}_collapse-unique.fastq"
     output:
         "results/split_seq/{sample}_atleast-2.fastq"
+    conda:
+        "environment.yml"
     threads: 1
     shell:
         "SplitSeq.py group -s {input} -f CONSCOUNT --num 2 --outname {wildcards.sample} --outdir results/split_seq"
@@ -123,6 +141,8 @@ rule parse_headers2:
         "results/split_seq/{sample}_atleast-2.fastq"
     output:
         "results/annotation_tables/{sample}_atleast-2_headers.tab"
+    conda:
+        "environment.yml"
     threads: 1
     shell:
         "ParseHeaders.py table -s {input} -f ID PRCONS CONSCOUNT DUPCOUNT --outdir results/annotation_tables"
@@ -144,6 +164,8 @@ rule parse_log:
         "results/annotation_tables/{sample}_BC1_table.tab",
         "results/annotation_tables/{sample}_BC2_table.tab",
         "results/annotation_tables/{sample}_AP_table.tab"
+    conda:
+        "environment.yml"
     threads: 4
     run:
         shell('ParseLog.py -l {input[0]} {input[1]} -f ID QUALITY --outdir results/annotation_tables'),
