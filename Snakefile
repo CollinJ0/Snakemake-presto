@@ -144,6 +144,7 @@ rule parse_log:
         "results/annotation_tables/{sample}_BC1_table.tab",
         "results/annotation_tables/{sample}_BC2_table.tab",
         "results/annotation_tables/{sample}_AP_table.tab"
+    threads: 4
     run:
         shell('ParseLog.py -l {input[0]} {input[1]} -f ID QUALITY --outdir results/annotation_tables'),
         shell('ParseLog.py -l {input[2]} {input[3]} -f ID PRIMER BARCODE ERROR --outdir results/annotation_tables'),
