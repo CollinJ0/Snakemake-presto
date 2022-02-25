@@ -1,5 +1,7 @@
 # Snakemake-presto
 
+A Snakemake pipeline of Presto's [UMI Barcoded Illumina MiSeq 2x250 BCR mRNA preprocessing workflow.](https://presto.readthedocs.io/en/stable/workflows/Stern2014_Workflow.html)
+
 ## Dependencies
 * [Conda](https://conda.io/en/latest/index.html)
 * [Mamba](https://mamba.readthedocs.io/en/latest/) (optional)
@@ -18,9 +20,13 @@ Mamba can be installed with Conda. Mamba an extremely fast and robust replacemen
 $ conda install -n base -c conda-forge mamba
 ```
 
-All other dependencies will be automatically installed using conda environments and can be found in the corresponding environment.yaml file.
+All other dependencies will be automatically installed using conda environments with the following code.
+
+```shell
+$ mamba env create -f environment.yml
+```
 
 
 <p align="center"> 
-    <img src="dag.png" alt="workflow" width="500"/>
+    <img src="dag.png" alt="workflow" />
 </p>
