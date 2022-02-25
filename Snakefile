@@ -85,7 +85,8 @@ rule assemble_pairs:
         "results/pair_pass/{sample}_R1_consensus-pass_pair-pass.fastq",
         "results/pair_pass/{sample}_R2_consensus-pass_pair-pass.fastq"
     output:
-        "results/assemble_pass/{sample}_assemble-pass.fastq"
+        "results/assemble_pass/{sample}_assemble-pass.fastq",
+        "results/logs/{sample}_AP.log"
     threads: 16
     shell:
         "AssemblePairs.py align -1 {input[0]} -2 {input[1]} --coord presto --rc tail --1f CONSCOUNT --2f CONSCOUNT PRCONS --outname {wildcards.sample} --outdir results/assemble_pass --log results/logs/{wildcards.sample}_AP.log --nproc {threads}"    
