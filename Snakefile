@@ -134,7 +134,8 @@ rule parse_log:
         "results/logs/{sample}_MP2.log",
         "results/logs/{sample}_BC1.log",
         "results/logs/{sample}_BC2.log",
-        "results/logs/{sample}_AP.log"
+        "results/logs/{sample}_AP.log",
+        "results/annotation_tables/{sample}_atleast-2_headers.tab"
     output:
         "results/annotation_tables/{sample}_FS1_table.tab",
         "results/annotation_tables/{sample}_FS2_table.tab",
@@ -143,7 +144,6 @@ rule parse_log:
         "results/annotation_tables/{sample}_BC1_table.tab",
         "results/annotation_tables/{sample}_BC2_table.tab",
         "results/annotation_tables/{sample}_AP_table.tab",
-        "results/annotation_tables/{sample}_atleast-2_headers.tab"
     threads: 4
     run:
         shell('ParseLog.py -l {input[0]} {input[1]} -f ID QUALITY --outdir results/annotation_tables'),
