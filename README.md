@@ -28,5 +28,5 @@ $ mamba env create -f environment.yml
 
 
 <p align="center"> 
-    <img src="dag.png" alt="workflow" height="50"/>
+    <img src="dag.png" alt="workflow" height="500"/>
 </p>
