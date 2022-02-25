@@ -6,7 +6,14 @@ SAMPLES = [f.split('_R1_001.fastq')[0] for f in os.listdir('data') if '_R1_001.f
 
 rule all:
     input:
-        expand("results/assemble_pass/{sample}_assemble-pass.fastq", sample=SAMPLES)
+        expand("results/annotation_tables/{sample}_atleast-2_headers.tab", sample=SAMPLES)
+        expand("results/annotation_tables/{sample}_FS1_table.tab", sample=SAMPLES),
+        expand("results/annotation_tables/{sample}_FS2_table.tab", sample=SAMPLES),
+        expand("results/annotation_tables/{sample}_MP1_table.tab", sample=SAMPLES),
+        expand("results/annotation_tables/{sample}_MP2_table.tab", sample=SAMPLES),
+        expand("results/annotation_tables/{sample}_BC1_table.tab", sample=SAMPLES),
+        expand("results/annotation_tables/{sample}_BC2_table.tab", sample=SAMPLES),
+        expand("results/annotation_tables/{sample}_AP_table.tab", sample=SAMPLES)
 
 rule filter_seq:
     input:
@@ -83,3 +90,62 @@ rule assemble_pairs:
     threads: 16
     shell:
         "AssemblePairs.py align -1 {input[0]} -2 {input[1]} --coord presto --rc tail --1f CONSCOUNT --2f CONSCOUNT PRCONS --outname {wildcards.sample} --outdir results/assemble_pass --log results/logs/{wildcards.sample}_AP.log --nproc {threads}"    
+
+rule parse_headers1:
+    input:
+        "results/assemble_pass/{sample}_assemble-pass.fastq"
+    output:
+        "results/assemble_pass/{sample}_assemble-pass_reheader.fastq"
+    threads: 1
+    shell:
+        "ParseHeaders.py collapse -s {input} -f CONSCOUNT --act min --outdir results/assemble_pass"
+
+rule collapse_seq:
+    input:
+        "results/assemble_pass/{sample}_assemble-pass_reheader.fastq"
+    output:
+        "results/collapse_unique/{sample}_collapse-unique.fastq"
+    threads: 1
+    shell:
+        "CollapseSeq.py -s {input} -n 20 --inner --uf PRCONS --cf CONSCOUNT --act sum --outname {wildcards.sample} --outdir results/collapse_unique"
+
+rule split_seq:
+    input:
+        "results/collapse_unique/{sample}_collapse-unique.fastq"
+    output:
+        "results/split_seq/{sample}_atleast-2.fastq"
+    threads: 1
+    shell:
+        "SplitSeq.py group -s {input} -f CONSCOUNT --num 2 --outname {wildcards.sample} --outdir results/split_seq"
+
+rule parse_headers2:
+    input:
+        "results/split_seq/{sample}_atleast-2.fastq"
+    output:
+        "results/annotation_tables/{sample}_atleast-2_headers.tab"
+    threads: 1
+    shell:
+        "ParseHeaders.py table -s {input} -f ID PRCONS CONSCOUNT DUPCOUNT --outdir results/annotation_tables"
+    
+rule parse_log:
+    input:
+        "results/logs/{sample}_FS1.log",
+        "results/logs/{sample}_FS2.log",
+        "results/logs/{sample}_MP1.log",
+        "results/logs/{sample}_MP2.log",
+        "results/logs/{sample}_BC1.log",
+        "results/logs/{sample}_BC2.log",
+        "results/logs/{sample}_AP.log"
+    output:
+        "results/annotation_tables/{sample}_FS1_table.tab",
+        "results/annotation_tables/{sample}_FS2_table.tab",
+        "results/annotation_tables/{sample}_MP1_table.tab",
+        "results/annotation_tables/{sample}_MP2_table.tab",
+        "results/annotation_tables/{sample}_BC1_table.tab",
+        "results/annotation_tables/{sample}_BC2_table.tab",
+        "results/annotation_tables/{sample}_AP_table.tab"
+    run:
+        shell('ParseLog.py -l {input[0]} {input[1]} -f ID QUALITY --outdir results/annotation_tables'),
+        shell('ParseLog.py -l {input[2]} {input[3]} -f ID PRIMER BARCODE ERROR --outdir results/annotation_tables'),
+        shell('ParseLog.py -l {input[4]} {input[5]} -f BARCODE SEQCOUNT CONSCOUNT PRIMER PRCONS PRCOUNT PRFREQ ERROR --outdir results/annotation_tables'),
+        shell('ParseLog.py -l {input[6]} -f ID LENGTH OVERLAP ERROR PVALUE FIELDS1 FIELDS2 --outdir results/annotation_tables')
