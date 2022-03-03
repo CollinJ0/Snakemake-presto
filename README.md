@@ -20,10 +20,17 @@ Mamba can be installed with Conda. Mamba an extremely fast and robust replacemen
 $ conda install -n base -c conda-forge mamba
 ```
 
-All other dependencies will be automatically installed using conda environments with the following code.
+All other dependencies will be automatically installed using conda environments with the following code:
 
 ```shell
 $ mamba env create -f environment.yml
+```
+
+To run the pipeline, Modify the primers fasta files to contain the primers present in your sequences, make a 'data' directory in the root folder of this repository, and copy all of your paired fastq files (not gzipped) to that 'data' directory. Then run the following code in the same directory as the snakefile:
+
+```shell
+$ conda activate Snakemake-presto
+$ snakemake --cores all
 ```
 
 
