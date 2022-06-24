@@ -33,7 +33,8 @@ rule mask_primers:
         "results/quality_pass/{sample}_R1_quality-pass.fastq",
         "results/quality_pass/{sample}_R2_quality-pass.fastq",
         config['constant_primers'],
-        config['vgene_primers']
+        config['vgene_primers'],
+        config['r1_umi_len']
     output:
         temp("results/primers_pass/{sample}_R1_primers-pass.fastq"),
         temp("results/primers_pass/{sample}_R2_primers-pass.fastq"),
@@ -41,7 +42,7 @@ rule mask_primers:
         "results/logs/{sample}_MP2.log"
     threads: 16
     run:
-        shell("MaskPrimers.py score -s {input[0]} -p {input[2]} --start 12 --mode cut --barcode --outdir results/primers_pass/ --outname {wildcards.sample}_R1 --log results/logs/{wildcards.sample}_MP1.log --nproc {threads}"),
+        shell("MaskPrimers.py score -s {input[0]} -p {input[2]} --start {input[4]} --mode cut --barcode --outdir results/primers_pass/ --outname {wildcards.sample}_R1 --log results/logs/{wildcards.sample}_MP1.log --nproc {threads}"),
         shell("MaskPrimers.py score -s {input[1]} -p {input[3]} --start 0 --mode mask --outdir results/primers_pass/ --outname {wildcards.sample}_R2 --log results/logs/{wildcards.sample}_MP2.log --nproc {threads}")
 
 rule pair_seq:
