@@ -78,7 +78,7 @@ rule pair_seq2:
         temp("results/pair_pass/{sample}_R2_consensus-pass_pair-pass.fastq")
     threads: 1
     shell:
-        "PairSeq.py -1 {input[0]} -2 {input[1]} --coord illumina --outdir results/pair_pass/"
+        "PairSeq.py -1 {input[0]} -2 {input[1]} --coord presto --outdir results/pair_pass/"
 
 rule assemble_pairs:
     input:
